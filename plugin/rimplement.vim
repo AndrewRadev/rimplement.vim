@@ -25,7 +25,7 @@ function! s:Rimplement(type)
   if a:type == 'route'
     call s:RimplementRoute()
   elseif a:type == 'class'
-    call s:RimplementClass(cword)
+    call s:RimplementClass(cword, "")
   elseif a:type == 'method'
     call s:RimplementMethod(cword)
   endif
@@ -36,10 +36,20 @@ function! s:RimplementComplete(_a, _cl, _c)
 endfunction
 
 " TODO (2014-10-23) Use projections if available -- for the template
-function! s:RimplementClass(class_name)
+function! s:RimplementClass(class_name, location)
   let class_name = a:class_name
-  let location = input("Rimplement Class in which directory: ", "", "dir")
-  let underscored_name = lib#Underscore(class_name)
+
+  if a:location != ""
+    let location = a:location
+  else
+    let location = input("Implement Class in which directory: ", "", "dir")
+  endif
+
+  if location == ''
+    return
+  endif
+
+  let underscored_name = s:Underscore(class_name)
 
   if isdirectory(location)
     let file_path = simplify(location.'/'.underscored_name.'.rb')
@@ -50,7 +60,6 @@ function! s:RimplementClass(class_name)
 
   if filereadable(file_path)
     exe 'edit '.file_path
-    echomsg "File already exists"
     return
   else
     exe 'edit '.file_path
@@ -63,24 +72,34 @@ function! s:RimplementClass(class_name)
   endif
 endfunction
 
-" TODO (2014-10-23) Rimplement method
-" function! s:RimplementMethod(method_name)
-"   let method_name = a:method_name
-"   let location = input("Rimplement Method where: ", "", "file")
+function! s:RimplementMethod(method_name)
+  let method_name = a:method_name
+  let location = input("Implement Method in which file: ", "", "file")
 
-"   if filereadable(file_path)
-"     echoerr "File already exists: ".file_path
-"     return
-"   else
-"     exe 'edit '.file_path
-"     call append(0, [
-"           \ 'class '.class_name,
-"           \ 'end',
-"           \ ])
-"     $delete _
-"     normal! gg
-"   endif
-" endfunction
+  " TODO (2014-11-07) Infer class from context?
+  let class_name = s:CapitalCamelCase(fnamemodify(location, ':t:r'))
+
+  call s:RimplementClass(class_name, s:Dirname(location))
+
+  " TODO (2014-11-07) Infer location of method based on class contents?
+  " TODO (2014-11-07) Implement methods in the same class under the "private" label?
+  "
+  let class_line = search('class '.class_name, 'n')
+  if class_line <= 0
+    echomsg "Couldn't find the definition of the ".class_name." class"
+    return
+  endif
+
+  call append(class_line, [
+        \   '  def '.method_name,
+        \   '  end',
+        \   ''
+        \ ])
+endfunction
+
+function! s:Dirname(file)
+  return fnamemodify(a:file, ':h')
+endfunction
 
 function s:RimplementRoute()
   if search('''[^'']*\%#[^'']*''', 'nbc', line('.')) > 0
