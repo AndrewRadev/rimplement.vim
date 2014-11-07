@@ -104,7 +104,7 @@ function s:RimplementRoute()
   if !filereadable(filename)
     " then it doesn't exist yet, fill it in
     call append(0, [
-          \ 'class '.lib#CapitalCamelCase(controller).'Controller < ApplicationController',
+          \ 'class '.s:CapitalCamelCase(controller).'Controller < ApplicationController',
           \ '  def '.action,
           \ '  end',
           \ 'end',
@@ -133,6 +133,37 @@ function s:RimplementRoute()
   endif
 
   write
+endfunction
+
+" Capitalize first letter of argument:
+" foo -> Foo
+function! s:Capitalize(word)
+  return substitute(a:word, '^\w', '\U\0', 'g')
+endfunction
+
+" CamelCase underscored word:
+" foo_bar_baz -> fooBarBaz
+function! s:CamelCase(word)
+  return substitute(a:word, '_\(.\)', '\U\1', 'g')
+endfunction
+
+" CamelCase and Capitalize
+" foo_bar_baz -> FooBarBaz
+function! s:CapitalCamelCase(word)
+  return s:Capitalize(s:CamelCase(a:word))
+endfunction
+
+" Underscore CamelCased word:
+" FooBarBaz -> foo_bar_baz
+function! s:Underscore(word)
+  let result = s:Lowercase(a:word)
+  return substitute(result, '\([A-Z]\)', '_\l\1', 'g')
+endfunction
+
+" Lowercase first letter of argument:
+" Foo -> foo
+function! s:Lowercase(word)
+  return substitute(a:word, '^\w', '\l\0', 'g')
 endfunction
 
 let &cpo = s:keepcpo
