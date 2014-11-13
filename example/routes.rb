@@ -3,6 +3,15 @@ Foo::Application.routes.draw do
 
   get '/about' => 'pages#about'
 
-  resources :users
-  resource :profile
+  resources :users do
+    collection do
+      get :example
+    end
+  end
+
+  resource :profile do
+    member do
+      get :sync
+    end
+  end
 end

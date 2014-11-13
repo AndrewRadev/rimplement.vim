@@ -1,3 +1,5 @@
+let s:http_method_pattern = '\<\%(get\|post\|put\|delete\|patch\)\>'
+
 function rimplement#route#Main()
   if rimplement#SearchUnderCursor('''[^'']\+''') > 0
     let description = rimplement#GetMotion("vi'")
@@ -12,6 +14,16 @@ function rimplement#route#Main()
     call search(':\k')
     let resource = expand('<cword>')
     let description = resource.'#show'
+
+  elseif rimplement#SearchUnderCursor(s:http_method_pattern.'\s\+:\k\+') > 0
+    call search(':\k')
+    let action = expand('<cword>')
+    if search('^\s*resources\= :\zs\k\+\ze do$', 'b') < 0
+      echomsg "Found the action '".action."', but can't find a containing resource."
+      return
+    endif
+    let controller = expand('<cword>')
+    let description = controller.'#'.action
 
   else
     echomsg "Couldn't find string description"
