@@ -1,0 +1,5 @@
+- Infer what to implement from what's under the cursor
+- Infer where in the class to place the method
+- Read projections
+- Research rails.vim projections
+- Implement different kinds of routes
