@@ -1,8 +1,18 @@
 function rimplement#route#Main()
-  if search('''[^'']*\%#[^'']*''', 'nbc', line('.')) > 0
-    let description = rimplement#GetMotion("Vi'")
-  elseif search('"[^"]*\%#[^"]*"', 'nbc', line('.')) > 0
-    let description = rimplement#GetMotion('Vi"')
+  if rimplement#SearchUnderCursor('''[^'']\+''') > 0
+    let description = rimplement#GetMotion("vi'")
+  elseif rimplement#SearchUnderCursor('"[^"]\+"') > 0
+    let description = rimplement#GetMotion('vi"')
+
+  elseif rimplement#SearchUnderCursor('resources :\k\+') > 0
+    call search(':\k')
+    let resource = expand('<cword>')
+    let description = resource.'#index'
+  elseif rimplement#SearchUnderCursor('resource :\k\+') > 0
+    call search(':\k')
+    let resource = expand('<cword>')
+    let description = resource.'#show'
+
   else
     echomsg "Couldn't find string description"
     return

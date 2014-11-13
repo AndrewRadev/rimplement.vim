@@ -3,5 +3,6 @@ Foo::Application.routes.draw do
 
   get '/about' => 'pages#about'
 
-  resource :users
+  resources :users
+  resource :profile
 end
