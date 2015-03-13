@@ -1,6 +1,11 @@
-function! rimplement#method#Main(method_name)
+function! rimplement#method#Main(method_name, location)
   let method_name = a:method_name
-  let location = input("Implement Method in which file: ", "", "file")
+
+  if a:location == ''
+    let location = input("Implement Method in which file: ", "", "file")
+  else
+    let location = a:location
+  endif
 
   " TODO (2014-11-07) Infer class from context?
   let class_name = rimplement#CapitalCamelCase(fnamemodify(location, ':t:r'))
