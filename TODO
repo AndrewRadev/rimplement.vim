@@ -1,7 +1,0 @@
-- Infer what to implement from what's under the cursor
-- Infer where in the class to place the method
-- Read projections
-- Research rails.vim projections
-- Implement different kinds of routes
-
-- Implement utility functions to "inject" a method, create a class. Think well about the interface: flags, options, different functions for different cases?

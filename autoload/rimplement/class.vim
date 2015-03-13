@@ -2,10 +2,13 @@
 function! rimplement#class#Main(class_name, location)
   let class_name = a:class_name
 
+  " Ensure it's camelcased
+  let class_name = rimplement#CapitalCamelCase(class_name)
+
   if a:location != ""
     let location = a:location
   else
-    let location = input("Implement Class in which directory: ", "", "dir")
+    let location = input("Implement class '".class_name."' in which directory? ", "", "dir")
   endif
 
   if location == ''

@@ -6,6 +6,10 @@ let g:loaded_rimplement = '0.0.1' " version number
 let s:keepcpo = &cpo
 set cpo&vim
 
+" TODO Implement utility functions to "inject" a method, create a class. Think
+" well about the interface: flags, options, different functions for different
+" cases?
+
 let s:implementation_types = ['class', 'route', 'method']
 
 " :Rimplement <path> <type>
@@ -48,6 +52,53 @@ function! s:Rimplement(...)
   elseif type == 'method'
     call rimplement#method#Main(cword, path)
   endif
+endfunction
+
+" :RimplementClass <path>
+"
+command! -nargs=* -complete=dir RimplementClass call s:RimplementClass(<q-args>)
+function! s:RimplementClass(...)
+  let cword = expand('<cword>')
+
+  if cword == ''
+    echomsg "Nothing under the cursor"
+    return
+  endif
+
+  if a:0 >= 1
+    let path = a:1
+  else
+    let path = ''
+  endif
+
+  call rimplement#class#Main(cword, path)
+endfunction
+
+" :RimplementMethod <path>
+"
+command! -nargs=* -complete=file RimplementMethod call s:RimplementMethod(<q-args>)
+function! s:RimplementMethod(...)
+  let cword = expand('<cword>')
+
+  if cword == ''
+    echomsg "Nothing under the cursor"
+    return
+  endif
+
+  if a:0 >= 1
+    let path = a:1
+  else
+    let path = ''
+  endif
+
+  call rimplement#method#Main(cword, path)
+endfunction
+
+" :RimplementRoute <route>
+"
+command! RimplementRoute call s:RimplementRoute()
+function! s:RimplementRoute(...)
+  call rimplement#route#Main()
 endfunction
 
 function! s:GuessImplementationType(word)

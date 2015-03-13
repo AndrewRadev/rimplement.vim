@@ -1,32 +1,9 @@
 let s:http_method_pattern = '\<\%(get\|post\|put\|delete\|patch\)\>'
 
 function rimplement#route#Main()
-  if rimplement#SearchUnderCursor('''[^'']\+''') > 0
-    let description = rimplement#GetMotion("vi'")
-  elseif rimplement#SearchUnderCursor('"[^"]\+"') > 0
-    let description = rimplement#GetMotion('vi"')
+  let description = s:FindRouteDescription()
 
-  elseif rimplement#SearchUnderCursor('resources :\k\+') > 0
-    call search(':\k')
-    let resource = expand('<cword>')
-    let description = resource.'#index'
-  elseif rimplement#SearchUnderCursor('resource :\k\+') > 0
-    call search(':\k')
-    let resource = expand('<cword>')
-    let description = resource.'#show'
-
-  elseif rimplement#SearchUnderCursor(s:http_method_pattern.'\s\+:\k\+') > 0
-    call search(':\k')
-    let action = expand('<cword>')
-    if search('^\s*resources\= :\zs\k\+\ze do$', 'b') < 0
-      echomsg "Found the action '".action."', but can't find a containing resource."
-      return
-    endif
-    let controller = expand('<cword>')
-    let description = controller.'#'.action
-
-  else
-    echomsg "Couldn't find string description"
+  if description == ''
     return
   endif
 
@@ -71,4 +48,32 @@ function rimplement#route#Main()
   endif
 
   write
+endfunction
+
+function! s:FindRouteDescription()
+  if rimplement#SearchUnderCursor('''[^'']\+''') > 0
+    return rimplement#GetMotion("vi'")
+  elseif rimplement#SearchUnderCursor('"[^"]\+"') > 0
+    return rimplement#GetMotion('vi"')
+  elseif rimplement#SearchUnderCursor('resources :\k\+') > 0
+    call search(':\k')
+    let resource = expand('<cword>')
+    return resource.'#index'
+  elseif rimplement#SearchUnderCursor('resource :\k\+') > 0
+    call search(':\k')
+    let resource = expand('<cword>')
+    return resource.'#show'
+  elseif rimplement#SearchUnderCursor(s:http_method_pattern.'\s\+:\k\+') > 0
+    call search(':\k')
+    let action = expand('<cword>')
+    if search('^\s*resources\= :\zs\k\+\ze do$', 'b') < 0
+      echomsg "Found the action '".action."', but can't find a containing resource."
+      return ''
+    endif
+    let controller = expand('<cword>')
+    return controller.'#'.action
+  endif
+
+  echomsg "Couldn't find string description"
+  return ''
 endfunction

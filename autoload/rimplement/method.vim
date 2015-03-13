@@ -1,10 +1,18 @@
+" TODO (2015-03-13) Infer where in class to place the method
 function! rimplement#method#Main(method_name, location)
   let method_name = a:method_name
 
+  " Ensure it's underscored
+  let method_name = rimplement#Underscore(method_name)
+
   if a:location == ''
-    let location = input("Implement Method in which file: ", "", "file")
+    let location = input("Implement method '".method_name."' in which file? ", "", "file")
   else
     let location = a:location
+  endif
+
+  if location == ''
+    return
   endif
 
   " TODO (2014-11-07) Infer class from context?
