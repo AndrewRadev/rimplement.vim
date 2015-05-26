@@ -10,7 +10,7 @@ set cpo&vim
 " well about the interface: flags, options, different functions for different
 " cases?
 
-let s:implementation_types = ['class', 'route', 'method']
+let s:implementation_types = ['class', 'route', 'method', 'partial']
 
 " :Rimplement <path> <type>
 "
@@ -51,6 +51,10 @@ function! s:Rimplement(...)
     call rimplement#class#Main(cword, path)
   elseif type == 'method'
     call rimplement#method#Main(cword, path)
+  elseif type == 'partial'
+    call rimplement#partial#Main()
+  else
+    throw "Rimplement: Unknown implementation type: ".type
   endif
 endfunction
 
@@ -104,7 +108,13 @@ endfunction
 function! s:GuessImplementationType(word)
   if expand('%:.') == 'config/routes.rb'
     return 'route'
-  elseif a:word =~ '^[a-z0-9_]\+$'
+  endif
+
+  if rimplement#SearchUnderCursor('render\s*[''"]\(\f\+\)[''"]', 'n')
+    return 'partial'
+  endif
+
+  if a:word =~ '^[a-z0-9_]\+$'
     return 'method'
   elseif a:word =~ '^[a-zA-Z0-9]\+$'
     return 'class'
