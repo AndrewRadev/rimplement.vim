@@ -12,14 +12,24 @@ function rimplement#route#Main()
     return
   endif
 
+  let nesting = s:FindRouteNesting()
+  echomsg string(nesting)
+  if len(nesting) > 0
+    let file_prefix = join(nesting, '/').'/'
+    let module_prefix = join(map(nesting, 'rimplement#CapitalCamelCase(v:val)'), '::').'::'
+  else
+    let file_prefix = ''
+    let module_prefix = ''
+  endif
+
   let [controller, action] = split(description, '#')
-  let filename = 'app/controllers/'.controller.'_controller.rb'
+  let filename = 'app/controllers/'.file_prefix.controller.'_controller.rb'
   exe 'edit '.filename
 
   if !filereadable(filename)
     " then it doesn't exist yet, fill it in
     call append(0, [
-          \ 'class '.rimplement#CapitalCamelCase(controller).'Controller < ApplicationController',
+          \ 'class '.module_prefix.rimplement#CapitalCamelCase(controller).'Controller < ApplicationController',
           \ '  def '.action,
           \ '  end',
           \ 'end',
@@ -76,4 +86,19 @@ function! s:FindRouteDescription()
 
   echomsg "Couldn't find string description"
   return ''
+endfunction
+
+function! s:FindRouteNesting()
+  " Find any parent routes
+  let indent = indent('.')
+  let route_path = []
+  let namespace_pattern = 'namespace :\zs\k\+'
+
+  while search('^ \{'.(indent - &sw).'}'.namespace_pattern, 'bW')
+    let route = expand('<cword>')
+    call insert(route_path, route, 0)
+    let indent = indent('.')
+  endwhile
+
+  return route_path
 endfunction
