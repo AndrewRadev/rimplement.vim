@@ -88,7 +88,7 @@ endfunction
 " same way as the built-in |search()| call. Any other flags will be ignored.
 "
 function! rimplement#SearchUnderCursor(pattern, ...)
-  let [match_start, match_end] = call('rimplement#SearchposUnderCursor', [a:pattern] + a:000)
+  let [match_start, match_end] = call('rimplement#SearchColsUnderCursor', [a:pattern] + a:000)
   if match_start > 0
     return match_start
   else
@@ -96,7 +96,7 @@ function! rimplement#SearchUnderCursor(pattern, ...)
   endif
 endfunction
 
-" function! rimplement#SearchposUnderCursor(pattern, flags, skip) {{{2
+" function! rimplement#SearchColsUnderCursor(pattern, flags, skip) {{{2
 "
 " Searches for a match for the given pattern under the cursor. Returns the
 " start and (end + 1) column positions of the match. If nothing was found,
@@ -108,7 +108,7 @@ endfunction
 "
 " See rimplement#SearchUnderCursor for the behaviour of a:flags
 "
-function! rimplement#SearchposUnderCursor(pattern, ...)
+function! rimplement#SearchColsUnderCursor(pattern, ...)
   if a:0 >= 1
     let given_flags = a:1
   else
